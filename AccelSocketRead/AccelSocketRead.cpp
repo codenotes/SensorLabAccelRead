@@ -98,9 +98,13 @@ void handlerError(const boost::system::error_code& e)
 
 
 //#define SYNC
-
+int median2test();
 int main(int argc, char* argv[])
 {
+
+	median2test();
+
+	return 0;
 	try
 	{
 		if (argc != 3)
