@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #define inline
 
-typedef int Item;
+typedef float Item;
+
+
 typedef struct Mediator_t
 {
 	Item* data;  //circular queue of values
@@ -154,18 +156,18 @@ void PrintMaxHeap(Mediator* m)
 void PrintMinHeap(Mediator* m)
 {
 	int i;
-	if (m->minCt) printf("Min: %3d", m->data[m->heap[1]]);
+	if (m->minCt) printf("Min: %f", m->data[m->heap[1]]);
 	for (i = 2; i <= m->minCt; ++i)
 	{
-		printf("|%3d ", m->data[m->heap[i]]);
-		if (++i <= m->minCt) printf("%3d", m->data[m->heap[i]]);
+		printf("|%f ", m->data[m->heap[i]]);
+		if (++i <= m->minCt) printf("%f", m->data[m->heap[i]]);
 	}
 	printf("\n");
 }
 void ShowTree(Mediator* m)
 {
 	PrintMaxHeap(m);
-	printf("Mid: %3d\n", m->data[m->heap[0]]);
+	printf("Mid: %f\n", m->data[m->heap[0]]);
 	PrintMinHeap(m);
 	printf("\n");
 }
@@ -173,7 +175,10 @@ void ShowTree(Mediator* m)
 int median2test()
 {
 	int i, v;
-	Mediator* m = MediatorNew(15);
+	int sz = 200; // size(data) / sizeof(double);
+	Mediator* m = MediatorNew(sz);
+
+
 
 	for (i = 0; i < 30; i++)
 	{

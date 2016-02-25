@@ -98,11 +98,21 @@ void handlerError(const boost::system::error_code& e)
 
 
 //#define SYNC
+
+float heapMedian3(float *a);
+extern double datafuck[];
 int median2test();
 int main(int argc, char* argv[])
 {
 
-	median2test();
+	for (int i = 0; i < 255; i++)
+	{
+
+		printf("%f\n", heapMedian3((float*)&datafuck[i]));
+
+	}
+
+	//median2test();
 
 	return 0;
 	try
