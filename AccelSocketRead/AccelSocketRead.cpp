@@ -23,6 +23,7 @@
 
 #include "ros/ros.h"
 #include "sensor_msgs/Imu.h"
+#include "tf/tf.h"
 
 //listense to sensorlog ipad app.
 #pragma comment(lib,"rosjadecpp-d-2015.lib")
@@ -31,9 +32,20 @@ using boost::asio::ip::tcp;
 
 boost::asio::streambuf b,b2;
 using namespace std;
-
+namespace ros
+{
+	namespace console
+	{
+		bool g_initialized;
+	}
+}
 void handler(const boost::system::error_code& e, std::size_t size)
 {
+	sensor_msgs::Imu imu;
+	tf::Quaternion q;
+
+	
+
 	if (!e)
 	{
 		std::istream is(&b);
@@ -61,6 +73,27 @@ void handler(const boost::system::error_code& e, std::size_t size)
 			{
 				cout << "x:" << list2.at(4) << "\ty:" << list2.at(5) << "\tz:" << list2.at(6) << endl;
 				cout << "gx:" << list2.at(8) << "\tgy:" << list2.at(9) << "\tgz:" << list2.at(10) << endl;
+
+			/*	auto q= tf::createQuaternionFromRPY(boost::lexical_cast<double>(list2.at(8)), boost::lexical_cast<double>(list2.at(9)),
+					boost::lexical_cast<double>(list2.at(10)));
+			*/
+				imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(boost::lexical_cast<double>(list2.at(8)), boost::lexical_cast<double>(list2.at(9)),
+					boost::lexical_cast<double>(list2.at(10)));
+				
+			/*	imu.orientation.x = q.x();
+				imu.orientation.y = q.y();
+				imu.orientation.z = q.z();
+				imu.orientation.w = q.w();*/
+				
+
+				imu.linear_acceleration.x = boost::lexical_cast<double>(list2.at(4));
+				imu.linear_acceleration.y = boost::lexical_cast<double>(list2.at(5));
+				imu.linear_acceleration.z = boost::lexical_cast<double>(list2.at(6));
+
+		
+
+
+
 			}
 			catch (...)
 			{
