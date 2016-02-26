@@ -1,5 +1,6 @@
 // AccelSocketRead.cpp : Defines the entry point for the console application.
 //
+#pragma warning(disable: 4996)
 
 #include "stdafx.h"
 //
@@ -20,7 +21,11 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/iter_find.hpp>
 
+#include "ros/ros.h"
+#include "sensor_msgs/Imu.h"
+
 //listense to sensorlog ipad app.
+#pragma comment(lib,"rosjadecpp-d-2015.lib")
 
 using boost::asio::ip::tcp;
 
@@ -107,6 +112,26 @@ int median2test();
 
 void createFilter(int wsize);
 double addpoint(double data);
+
+ros::NodeHandle n;
+
+void ROSLoop(int argc, char* argv[], char * nodename)
+{
+	sensor_msgs::Imu im;
+	ros::init(argc, argv, nodename);
+
+	ros::Publisher chatter_pub = n.advertise<sensor_msgs::Imu>("imu", 1000);
+	
+	ros::Rate loop_rate(10);
+
+	while (ros::ok())
+	{
+
+	}
+
+	
+
+}
 
 //2016-02-26 14:56:26.165,810,EDB848CE-CA93-4CF9-884F-13611D519969,114014.773573,-0.0321044921875,-0.7085113525390625,-0.7637786865234375,114014.775589,-0.004385161050924473,-0.1086809409250436,0.1194129474858449,1,1
 int main(int argc, char* argv[])
