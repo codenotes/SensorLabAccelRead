@@ -2,14 +2,16 @@
 //
 
 #include "stdafx.h"
+#include <fstream>
 
-#define MMSIZE 100;
-extern double datafuck[];
+#define MMSIZE 40
+extern double datatest[];
 
+char * gFname = 0;
 
 float heapMedian3(float *a)
 {
-	float left[255 /2], right[255 /2], median, *p;
+	float left[MMSIZE /2], right[MMSIZE /2], median, *p;
 	unsigned char nLeft, nRight;
 
 	// pick first value as median candidate

@@ -55,6 +55,7 @@ void handler(const boost::system::error_code& e, std::size_t size)
 			try
 			{
 				cout << "x:" << list2.at(4) << "\ty:" << list2.at(5) << "\tz:" << list2.at(6) << endl;
+				cout << "gx:" << list2.at(8) << "\tgy:" << list2.at(9) << "\tgz:" << list2.at(10) << endl;
 			}
 			catch (...)
 			{
@@ -99,22 +100,29 @@ void handlerError(const boost::system::error_code& e)
 
 //#define SYNC
 
+extern char * gFname ;
 float heapMedian3(float *a);
-extern double datafuck[];
+extern double datatest[];
 int median2test();
+
+void createFilter(int wsize);
+double addpoint(double data);
+
+//2016-02-26 14:56:26.165,810,EDB848CE-CA93-4CF9-884F-13611D519969,114014.773573,-0.0321044921875,-0.7085113525390625,-0.7637786865234375,114014.775589,-0.004385161050924473,-0.1086809409250436,0.1194129474858449,1,1
 int main(int argc, char* argv[])
 {
+	//createFilter(5);
+	//
+	//while (1)
+	//{
+	//	double d;
+	//	cin >> d;
+	//	cout << addpoint(d) << endl;
+	//}
+	//
+	//return 0;
 
-	for (int i = 0; i < 255; i++)
-	{
 
-		printf("%f\n", heapMedian3((float*)&datafuck[i]));
-
-	}
-
-	//median2test();
-
-	return 0;
 	try
 	{
 		if (argc != 3)

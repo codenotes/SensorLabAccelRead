@@ -154,7 +154,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AccelSocketRead.cpp" />
-    <ClCompile Include="MedianFilter.cpp" />
+    <ClCompile Include="filter.cpp" />
+    <ClCompile Include="medianfilter.cpp" />
     <ClCompile Include="MedianFilter2.cpp" />
     <ClCompile Include="NewItem.cpp" />
     <ClCompile Include="stdafx.cpp" />

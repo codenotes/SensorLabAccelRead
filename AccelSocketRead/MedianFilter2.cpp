@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #define inline
 
-typedef float Item;
+typedef double Item;
 
 
 typedef struct Mediator_t
@@ -171,22 +171,47 @@ void ShowTree(Mediator* m)
 	PrintMinHeap(m);
 	printf("\n");
 }
+extern double datatest[];
+extern double dtest2[];
+
+
+Mediator* m = 0;
+
+
+void createFilter(int wsize)
+{
+	if (!m)
+		m = MediatorNew(wsize); //sz is window size!!!
+
+}
+
+double addpoint(double data)
+{
+	Item v;
+
+	//printf("Inserting %3d \n", v);
+	MediatorInsert(m, data);
+	v = MediatorMedian(m);
+	//printf("Median = %3d. %f\n\n", v, v);
+	return v;
+
+}
 
 int median2test()
 {
 	int i, v;
-	int sz = 200; // size(data) / sizeof(double);
-	Mediator* m = MediatorNew(sz);
+	int sz = 5; // size(data) / sizeof(double);
+	
 
 
-
-	for (i = 0; i < 30; i++)
+	for (i = 0; i < 10; i++)
 	{
-		v = rand() & 127;
+		//v = rand() & 127;
+		v =  dtest2[i] ;
 		printf("Inserting %3d \n", v);
 		MediatorInsert(m, v);
 		v = MediatorMedian(m);
-		printf("Median = %3d.\n\n", v);
+		printf("Median = %3d. %f\n\n", v,v);
 		ShowTree(m);
 	}
 

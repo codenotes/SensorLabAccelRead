@@ -1,627 +1,141 @@
-///////////////////////////////////////////////////////////////////////////////
+//   medianfilter.cpp - impelementation of 
+//   1D and 2D median filter routines
 //
-//  Moving Median Filter Benchmark
-//
-//  Copyright (c) 2016 to present Nick Hilton
-//
-//  weegreenblobbie_at_yahoo_com
-//
-///////////////////////////////////////////////////////////////////////////////
+//   The code is property of LIBROW
+//   You can use it on your own
+//   When utilizing credit LIBROW site
 
-///////////////////////////////////////////////////////////////////////////////
-//
-//  This program is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU Library General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-//
-///////////////////////////////////////////////////////////////////////////////
-#include "stdafx.h"
-// C++ headers
-#include <algorithm>
-#include <cassert>
-#include <chrono>
-#include <deque>
-#include <exception>
-#include <iostream>
-#include <iterator>
-#include <limits>
-#include <list>
-#include <memory>
-#include <random>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <memory.h>
+#include "medianfilter.h"
 
-
-unsigned keep_odd(unsigned n)
+//   1D MEDIAN FILTER implementation
+//     signal - input signal
+//     result - output signal
+//     N      - length of the signal
+void _medianfilter(const element* signal, element* result, int N)
 {
-	if (n % 2 == 0) return n + 1;
-
-	return n;
+   //   Move window through all elements of the signal
+   for (int i = 2; i < N - 2; ++i)
+   {
+      //   Pick up window elements
+      element window[5];
+      for (int j = 0; j < 5; ++j)
+         window[j] = signal[i - 2 + j];
+      //   Order elements (only half of them)
+      for (int j = 0; j < 3; ++j)
+      {
+         //   Find position of minimum element
+         int min = j;
+         for (int k = j + 1; k < 5; ++k)
+            if (window[k] < window[min])
+               min = k;
+         //   Put found minimum element in its place
+         const element temp = window[j];
+         window[j] = window[min];
+         window[min] = temp;
+      }
+      //   Get result - the middle element
+      result[i - 2] = window[2];
+   }
 }
 
-
-template <class T>
-class FilterInterface
+//   1D MEDIAN FILTER wrapper
+//     signal - input signal
+//     result - output signal
+//     N      - length of the signal
+void medianfilter(element* signal, element* result, int N)
 {
-
-public:
-	virtual std::vector<T> filter(const std::vector<T> & in) = 0;
-};
-
-
-
-template <class T>
-class NthElement : public FilterInterface<T>
-{
-	std::vector<T> _history;
-	std::vector<T> _pool;
-	unsigned       _median;
-
-public:
-
-	NthElement(unsigned window_size)
-		:
-		_history(keep_odd(window_size), T()),
-		_pool(_history),
-		_median(window_size / 2 + 1)
-	{
-		assert(window_size >= 3);
-	}
-
-
-	std::vector<T> filter(const std::vector<T> & in)
-	{
-		assert(in.size() > 0);
-
-		//---------------------------------------------------------------------
-		// init state
-
-		unsigned hist_ptr = 0;
-
-		std::fill(_history.begin(), _history.end(), in[0]);
-
-		//---------------------------------------------------------------------
-		// filter input
-
-		std::vector<T> out;
-		out.reserve(in.size());
-
-		for (auto x : in)
-		{
-			// step 1, write to history pool
-
-			_history[hist_ptr] = x;
-
-			hist_ptr = (hist_ptr + 1) % _history.size();
-
-			// step 2, copy history to pool
-
-			std::copy(_history.begin(), _history.end(), _pool.begin());
-
-			// step 3, compute median on pool
-
-			auto first = _pool.begin();
-			auto last = _pool.end();
-			auto middle = first + (last - first) / 2;
-
-			std::nth_element(first, middle, last);
-
-			out.push_back(*middle);
-		}
-
-		return out;
-	}
-};
-
-
-template <class T>
-class LowerBoundVector : public FilterInterface<T>
-{
-	std::vector<T> _history;
-	std::vector<T> _pool;
-	unsigned       _median;
-
-public:
-
-	LowerBoundVector(unsigned window_size)
-		:
-		_history(keep_odd(window_size), T()),
-		_pool(_history),
-		_median(window_size / 2 + 1)
-	{
-		assert(window_size >= 3);
-	}
-
-	std::vector<T> filter(const std::vector<T> & in)
-	{
-		assert(in.size() > 0);
-
-		//---------------------------------------------------------------------
-		// init state
-
-		unsigned hist_ptr = 0;
-
-		std::fill(_history.begin(), _history.end(), in[0]);
-		std::fill(_pool.begin(), _pool.end(), in[0]);
-
-		// pool is keep sorted
-
-		//---------------------------------------------------------------------
-		// filter input
-
-		std::vector<T> out;
-		out.reserve(in.size());
-
-		for (auto x : in)
-		{
-			// step 1, remove oldest value from the pool.
-
-			auto last = _history[hist_ptr];
-
-			auto last_pos = std::lower_bound(_pool.begin(), _pool.end(), last);
-
-			_pool.erase(last_pos);
-
-			// step 2, insert new value into pool
-
-			auto insert_pos = std::lower_bound(_pool.begin(), _pool.end(), x);
-
-			_pool.insert(insert_pos, x);
-
-			// step 3, write input value into history.
-
-			_history[hist_ptr] = x;
-
-			hist_ptr = (hist_ptr + 1) % _history.size();
-
-			// median is always the middle of the pool
-
-			out.push_back(_pool[_median]);
-		}
-
-		return out;
-	}
-};
-
-
-template <class T>
-class LowerBoundDeque : public FilterInterface<T>
-{
-	std::vector<T> _history;
-	std::deque<T>  _pool;
-	unsigned       _median;
-
-public:
-
-	LowerBoundDeque(unsigned window_size)
-		:
-		_history(keep_odd(window_size), T()),
-		_pool(keep_odd(window_size), T()),
-		_median(window_size / 2 + 1)
-	{
-		assert(window_size >= 3);
-	}
-
-	std::vector<T> filter(const std::vector<T> & in)
-	{
-		assert(in.size() > 0);
-
-		//---------------------------------------------------------------------
-		// init state
-
-		unsigned hist_ptr = 0;
-
-		std::fill(_history.begin(), _history.end(), in[0]);
-		std::fill(_pool.begin(), _pool.end(), in[0]);
-
-		// pool is keep sorted
-
-		//---------------------------------------------------------------------
-		// filter input
-
-		std::vector<T> out;
-		out.reserve(in.size());
-
-		for (auto x : in)
-		{
-			// step 1, remove oldest value from the pool.
-
-			auto last = _history[hist_ptr];
-
-			auto last_pos = std::lower_bound(_pool.begin(), _pool.end(), last);
-
-			_pool.erase(last_pos);
-
-			// step 2, insert new value into pool
-
-			auto insert_pos = std::lower_bound(_pool.begin(), _pool.end(), x);
-
-			_pool.insert(insert_pos, x);
-
-			// step 3, write input value into history.
-
-			_history[hist_ptr] = x;
-
-			hist_ptr = (hist_ptr + 1) % _history.size();
-
-			// median is always the middle of the pool
-
-			out.push_back(*(_pool.begin() + _median));
-		}
-
-		return out;
-	}
-};
-
-
-//-----------------------------------------------------------------------------
-// types & random vectors
-
-
-template <class T>
-std::string type_string();
-
-template <> std::string type_string<short>() { return "short"; }
-template <> std::string type_string<int>() { return "int"; }
-template <> std::string type_string<long long>() { return "long long"; }
-template <> std::string type_string<float>() { return "float"; }
-template <> std::string type_string<double>() { return "double"; }
-
-
-template <class T>
-std::vector<T> get_random_vector(unsigned n_elements);
-
-
-template <class T>
-std::vector<T> get_random_integer_vector(unsigned n_elements)
-{
-	std::vector<T> out;
-
-	std::mt19937_64 rng;
-
-	union
-	{
-		std::uint_fast64_t from;
-		T                  to;
-	};
-
-	for (unsigned i = 0; i < n_elements; ++i)
-	{
-		from = rng();
-
-		out.push_back(to);
-	}
-
-	return out;
+   //   Check arguments
+   if (!signal || N < 1)
+      return;
+   //   Treat special case N = 1
+   if (N == 1)
+   {
+      if (result)
+         result[0] = signal[0];
+      return;
+   }
+   //   Allocate memory for signal extension
+   element* extension = new element[N + 4];
+   //   Check memory allocation
+   if (!extension)
+      return;
+   //   Create signal extension
+   memcpy(extension + 2, signal, N * sizeof(element));
+   for (int i = 0; i < 2; ++i)
+   {
+      extension[i] = signal[1 - i];
+      extension[N + 2 + i] = signal[N - 1 - i];
+   }
+   //   Call median filter implementation
+   _medianfilter(extension, result ? result : signal, N + 4);
+   //   Free memory
+   delete[] extension;
 }
 
-
-template <>
-std::vector<short> get_random_vector(unsigned n_elements)
+//   2D MEDIAN FILTER implementation
+//     image  - input image
+//     result - output image
+//     N      - width of the image
+//     M      - height of the image
+void _medianfilter(const element* image, element* result, int N, int M)
 {
-	return get_random_integer_vector<short>(n_elements);
+   //   Move window through all elements of the image
+   for (int m = 1; m < M - 1; ++m)
+      for (int n = 1; n < N - 1; ++n)
+      {
+         //   Pick up window elements
+         int k = 0;
+         element window[9];
+         for (int j = m - 1; j < m + 2; ++j)
+            for (int i = n - 1; i < n + 2; ++i)
+               window[k++] = image[j * N + i];
+         //   Order elements (only half of them)
+         for (int j = 0; j < 5; ++j)
+         {
+            //   Find position of minimum element
+            int min = j;
+            for (int l = j + 1; l < 9; ++l)
+            if (window[l] < window[min])
+               min = l;
+            //   Put found minimum element in its place
+            const element temp = window[j];
+            window[j] = window[min];
+            window[min] = temp;
+         }
+         //   Get result - the middle element
+         result[(m - 1) * (N - 2) + n - 1] = window[4];
+      }
 }
 
-
-template <>
-std::vector<int> get_random_vector(unsigned n_elements)
+//   2D MEDIAN FILTER wrapper
+//     image  - input image
+//     result - output image
+//     N      - width of the image
+//     M      - height of the image
+void medianfilter(element* image, element* result, int N, int M)
 {
-	return get_random_integer_vector<int>(n_elements);
-}
-
-
-template <>
-std::vector<long long> get_random_vector(unsigned n_elements)
-{
-	return get_random_integer_vector<long long>(n_elements);
-}
-
-
-template <class T>
-std::vector<T> get_random_float_vector(unsigned n_elements)
-{
-	std::vector<T> out;
-
-	std::mt19937_64 rng;
-
-	auto top = std::numeric_limits<std::uint_fast64_t>::max();
-	auto mid = top / 2;
-
-	T middle = static_cast<T>(mid);
-	T scale = 1.0 / middle;
-
-	for (unsigned i = 0; i < n_elements; ++i)
-	{
-		auto r = rng();
-
-		auto rrr = static_cast<T>(r) - middle;
-
-		out.push_back(scale * rrr);
-	}
-
-	return out;
-}
-
-
-template <>
-std::vector<float> get_random_vector(unsigned n_elements)
-{
-	return get_random_float_vector<float>(n_elements);
-}
-
-
-template <>
-std::vector<double> get_random_vector(unsigned n_elements)
-{
-	return get_random_float_vector<double>(n_elements);
-}
-
-
-//-----------------------------------------------------------------------------
-// timing utils
-
-using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
-
-
-TimePoint now()
-{
-	return std::chrono::system_clock::now();
-}
-
-
-
-template <class T>
-float delta(const T & d)
-{
-	return static_cast<float>(
-		std::chrono::duration_cast<std::chrono::milliseconds>(d).count()
-		);
-}
-
-
-const unsigned vector_size = 128000;
-const unsigned iterations = 15;
-
-
-template <class T>
-float run_timing_test(FilterInterface<T> & f)
-{
-	std::vector<float> timings;
-
-	auto input = get_random_vector<T>(vector_size);
-
-	for (unsigned i = 0; i < iterations; ++i)
-	{
-		auto t0 = now();
-
-		auto out = f.filter(input);
-
-		auto t1 = now();
-
-		timings.push_back(delta(t1 - t0));
-	}
-
-	// compute average of timing values
-
-	float avg = 0.0f;
-
-	for (auto t : timings) avg += t;
-
-	avg /= static_cast<float>(timings.size());
-
-	return avg;
-}
-
-
-enum Alignment { left, right, center };
-
-
-std::string print(const std::string & in, unsigned width, Alignment align = left)
-{
-	std::stringstream ss;
-
-	switch (align)
-	{
-	case left:
-	{
-		ss << in;
-
-		int delta = width - in.size();
-
-		while (delta > 0)
-		{
-			ss << " ";
-			--delta;
-		}
-
-		break;
-	}
-
-	case right:
-	{
-		int delta = width - in.size();
-
-		while (delta > 0)
-		{
-			ss << " ";
-			--delta;
-		}
-
-		ss << in;
-
-		break;
-	}
-
-	case center:
-	{
-		int delta = width - in.size();
-
-		int d = delta / 2 + delta % 2;
-
-		while (d > 0)
-		{
-			ss << " ";
-			--d;
-		}
-
-		ss << in;
-
-		d = delta / 2;
-
-		while (d > 0)
-		{
-			ss << " ";
-			--d;
-		}
-	}
-	}
-
-	return ss.str();
-}
-
-
-template <class T>
-void run_test()
-{
-	std::vector<unsigned> window_sizes = { 3, 5, 9, 17, 33, 65, 129, 257, 513 };
-
-	using std::cout;
-
-	using Type = T;
-
-	auto tname = type_string<Type>();
-
-	cout
-		<< "All times are milliseconds\n"
-		<< "T = " << tname << "\n"
-		<< "Filtering random std::vector<" << tname << ">\n"
-		<< "    vector.size() = " << vector_size << "\n"
-		<< "    n iterations  = " << iterations << "\n"
-		<< "TABLE:\n";
-
-	int width = 18;
-
-	cout
-		<< print("Window", width, center)
-		<< print("NthElement", width, center)
-		<< print("LowerBoundDeque", width, center)
-		<< print("LowerBoundVector", width, center)
-		<< "\n";
-
-	typedef std::shared_ptr<FilterInterface<Type>> FilterPtr;
-
-	for (auto w : window_sizes)
-	{
-		cout << print(std::to_string(w), width, center);
-
-		std::vector<FilterPtr> filters = {
-			std::make_shared<NthElement<Type>>(w),
-			std::make_shared<LowerBoundDeque<Type>>(w),
-			std::make_shared<LowerBoundVector<Type>>(w),
-		};
-
-		for (auto & fptr : filters)
-		{
-			auto t = run_timing_test(*fptr);
-
-			cout << print(std::to_string(static_cast<int>(t)), width, center);
-		}
-
-		cout << "\n";
-	}
-}
-
-
-
-int main2(int argc, char ** argv)
-{
-	std::vector<std::string> arguments;
-
-	for (int i = 1; i < argc; ++i)
-	{
-		arguments.push_back(std::string(argv[i]));
-	}
-
-	// default
-
-	if (arguments.empty())
-	{
-		arguments.push_back("--float");
-	}
-
-	//-------------------------------------------------------------------------
-	// handle command line arguments
-
-	for (auto & arg : arguments)
-	{
-		if (arg == "-h" || arg == "--help")
-		{
-			std::cout << R"xxx(
-usage: main OPTIONS
-
-Options:
-
-    -h|--help    Displays this help message
-    --short      Runs the benchmark using short type
-    --int        Runs the benchmark using int type
-    --long-long  Runs the benchmark using long long type
-    --float      Runs the benchmark using float type
-    --double     Runs the benchmark using double type
-
-								)xxx"
-				<< "\n";
-
-			return 1;
-		}
-
-		else
-			if (arg == "--short")
-			{
-				run_test<short>();
-				break;
-			}
-			else
-				if (arg == "--int")
-				{
-					run_test<int>();
-					break;
-				}
-				else
-					if (arg == "--long-long")
-					{
-						run_test<long long>();
-						break;
-					}
-					else
-						if (arg == "--float")
-						{
-							run_test<float>();
-							break;
-						}
-						else
-							if (arg == "--double")
-							{
-								run_test<double>();
-								break;
-							}
-
-							else
-							{
-								std::cerr << "unknown option '" << arg << "'\n";
-								return 1;
-							}
-	}
-
-	return 0;
+   //   Check arguments
+   if (!image || N < 1 || M < 1)
+      return;
+   //   Allocate memory for signal extension
+   element* extension = new element[(N + 2) * (M + 2)];
+   //   Check memory allocation
+   if (!extension)
+      return;
+   //   Create image extension
+   for (int i = 0; i < M; ++i)
+   {
+      memcpy(extension + (N + 2) * (i + 1) + 1, image + N * i, N * sizeof(element));
+      extension[(N + 2) * (i + 1)] = image[N * i];
+      extension[(N + 2) * (i + 2) - 1] = image[N * (i + 1) - 1];
+   }
+   //   Fill first line of image extension
+   memcpy(extension, extension + N + 2, (N + 2) * sizeof(element));
+   //   Fill last line of image extension
+   memcpy(extension + (N + 2) * (M + 1), extension + (N + 2) * M, (N + 2) * sizeof(element));
+   //   Call median filter implementation
+   _medianfilter(extension, result ? result : image, N + 2, M + 2);
+   //   Free memory
+   delete[] extension;
 }
