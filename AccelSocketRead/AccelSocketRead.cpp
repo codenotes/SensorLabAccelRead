@@ -25,10 +25,18 @@
 #include "sensor_msgs/Imu.h"
 #include "tf/tf.h"
 
+
+
+#include "ros/message_traits.h"
+#include "ros/builtin_message_traits.h"
+
 //listense to sensorlog ipad app.
 #pragma comment(lib,"rosjadecpp-d-2015.lib")
 
 using boost::asio::ip::tcp;
+ros::NodeHandle * gNode = 0;
+ros::Publisher  imu_pub ;
+
 
 boost::asio::streambuf b,b2;
 using namespace std;
@@ -39,11 +47,17 @@ namespace ros
 		bool g_initialized;
 	}
 }
+
+
+
+
+
 void handler(const boost::system::error_code& e, std::size_t size)
 {
 	sensor_msgs::Imu imu;
 	tf::Quaternion q;
-
+	//using namespace serialization;
+	namespace mt = ros::message_traits;
 	
 
 	if (!e)
@@ -90,14 +104,25 @@ void handler(const boost::system::error_code& e, std::size_t size)
 				imu.linear_acceleration.y = boost::lexical_cast<double>(list2.at(5));
 				imu.linear_acceleration.z = boost::lexical_cast<double>(list2.at(6));
 
-		
 
+
+
+				//ROS_ASSERT_MSG(impl_->md5sum_ == "*" || std::string(mt::md5sum<M>(*message)) == "*" || impl_->md5sum_ == mt::md5sum<M>(*message),
+					
+				
+			//	printf("Trying to publish message of type [%s/%s] on a publisher with type [%s/%s]",
+				//	mt::datatype<sensor_msgs::Imu>(*imu), mt::md5sum<sensor_msgs::Imu>(*message),
+//					imu.datatype_.c_str(), impl_->md5sum_.c_str());
+
+			
+		//		imu_pub.publish(imu);
 
 
 			}
-			catch (...)
+			catch (exception &e)
 			{
-				
+				cout << "***" << e.what() << "***" << endl;
+				cout << "---->" << line << endl;
 				cout << "boom size:" << list2.size() << " line:"<<line<< " insize:"<<size<<endl;
 				
 			}
@@ -146,12 +171,11 @@ int median2test();
 void createFilter(int wsize);
 double addpoint(double data);
 
-ros::NodeHandle n;
-
 void ROSLoop(int argc, char* argv[], char * nodename)
 {
 	sensor_msgs::Imu im;
 	ros::init(argc, argv, nodename);
+	ros::NodeHandle n;
 
 	ros::Publisher chatter_pub = n.advertise<sensor_msgs::Imu>("imu", 1000);
 	
@@ -169,6 +193,14 @@ void ROSLoop(int argc, char* argv[], char * nodename)
 //2016-02-26 14:56:26.165,810,EDB848CE-CA93-4CF9-884F-13611D519969,114014.773573,-0.0321044921875,-0.7085113525390625,-0.7637786865234375,114014.775589,-0.004385161050924473,-0.1086809409250436,0.1194129474858449,1,1
 int main(int argc, char* argv[])
 {
+	ros::init(argc, argv, "iPadIMUNode");
+
+	if (!gNode)
+		gNode = new ros::NodeHandle;
+
+	//imu_pub = &  gNode->advertise<sensor_msgs::Imu>("ipadimu", 1000);
+	imu_pub = gNode->advertise<sensor_msgs::Imu>("ipadimu", 1000);
+
 	//createFilter(5);
 	//
 	//while (1)
