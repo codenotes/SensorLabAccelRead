@@ -13,7 +13,7 @@ using namespace std;
 
 
 
-bool testt(string &s)
+bool testt(string s)
 {
 	cout << "process2:" << s << endl;
 	return true;
@@ -23,15 +23,20 @@ bool testt(string &s)
 
 int main()
 {
-	ParseIt p;
+	ParseIt p('\n',',');
 	string input;
 
 
-	//p.setCB(boost::bind(testt));
-	MyTestFunction f = boost::bind(testt);
+	p.setCB(testt);
+	//MyTestFunction f = boost::bind(testt);
+	
 
 
-	//p.feedstate("11;22;33;");
+
+	p.feedstate("\n1\n2\n3\n");
+	
+	
+	return 0;
 	//p.feedstate("4");
 	//p.feedstate("5;6;777");
 	//p.feedstate(";8;");

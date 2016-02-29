@@ -38,6 +38,8 @@ using boost::asio::ip::tcp;
 ros::NodeHandle * gNode = 0;
 ros::Publisher  imu_pub ;
 
+ParseIt gParesit(10,',');
+
 
 boost::asio::streambuf b,b2;
 using namespace std;
@@ -52,6 +54,31 @@ namespace ros
 
 
 ParseIt gParse;
+
+
+//will be called for every tween ;; that ParseItReads
+bool handleAndSend(string s)
+{
+	//split by smaller delimeters
+	cout << "should parse and send:" << s << endl;
+	return true;
+}
+
+
+void handler2(const boost::system::error_code& e, std::size_t size)
+{
+
+	
+	if (!e)
+	{
+		std::istream is(&b);
+		std::string line;
+		std::getline(is, line);
+		gParse.feedstate(line); //every block that comes from socket, feed into parser who will translate this correctly
+		
+	}
+
+}
 
 void handler(const boost::system::error_code& e, std::size_t size)
 {
@@ -202,6 +229,9 @@ int main(int argc, char* argv[])
 	//imu_pub = &  gNode->advertise<sensor_msgs::Imu>("ipadimu", 1000);
 	imu_pub = gNode->advertise<sensor_msgs::Imu>("ipadimu", 1000);
 
+
+	gParse.setCB(handleAndSend);
+
 	//createFilter(5);
 	//
 	//while (1)
@@ -258,7 +288,7 @@ int main(int argc, char* argv[])
 #ifdef SYNC
 			size_t len = socket.read_some(boost::asio::buffer(buf), error);
 #else
-			boost::asio::async_read_until(socket, b, '\n', handler);
+			boost::asio::async_read_until(socket, b, '\n', handler2);
 #endif
 
 			if (error == boost::asio::error::eof)

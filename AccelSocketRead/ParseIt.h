@@ -10,14 +10,19 @@
 #include <boost/function.hpp>
 using namespace std;
 
-typedef boost::function<bool(std::string)> MyTestFunction;
+typedef boost::function<bool(std::string)> ParseItProcessFunction;
 
 class ParseIt
 {
 public:
 	string line;
-	char mEol = ';';
+	char mEol = '\n';
 	char mDelim = ',';
+
+
+	ParseIt(char eol = '\n', char delim=',') :mEol(eol), mDelim(delim)
+	{}
+
 
 	bool Process(string &s)
 	{
@@ -27,7 +32,7 @@ public:
 
 	boost::function<bool(string &s)> callback;
 	
-	void setCB(MyTestFunction & fs)
+	void setCB(ParseItProcessFunction  fs)
 	{
 		callback = fs;
 
@@ -35,13 +40,14 @@ public:
 
 	void state(char c)
 	{
-
+	
+	//	printf("%d\n", c);
 		static string st = "";
 		static bool first = false;
 
 		bool second = false;
 
-		if (c == ';'&&!first)
+		if (c == mEol&&!first)
 		{
 			first = true;
 			return;
@@ -49,7 +55,7 @@ public:
 
 		if (first)
 		{
-			if (c == ';')
+			if (c == mEol)
 			{
 				if (!st.size())
 					return;
