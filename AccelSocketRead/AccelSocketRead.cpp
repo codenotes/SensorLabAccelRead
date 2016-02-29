@@ -29,6 +29,7 @@
 
 #include "ros/message_traits.h"
 #include "ros/builtin_message_traits.h"
+#include "ParseIt.h"
 
 //listense to sensorlog ipad app.
 #pragma comment(lib,"rosjadecpp-d-2015.lib")
@@ -50,7 +51,7 @@ namespace ros
 
 
 
-
+ParseIt gParse;
 
 void handler(const boost::system::error_code& e, std::size_t size)
 {

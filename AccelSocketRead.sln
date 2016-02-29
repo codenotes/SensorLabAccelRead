@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AccelSocketRead", "AccelSocketRead\AccelSocketRead.vcxproj", "{24DAE785-F078-4425-B2DB-54FCADC682A5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.vcxproj", "{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{24DAE785-F078-4425-B2DB-54FCADC682A5}.Release|x64.Build.0 = Release|x64
 		{24DAE785-F078-4425-B2DB-54FCADC682A5}.Release|x86.ActiveCfg = Release|Win32
 		{24DAE785-F078-4425-B2DB-54FCADC682A5}.Release|x86.Build.0 = Release|Win32
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Debug|x64.ActiveCfg = Debug|x64
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Debug|x64.Build.0 = Debug|x64
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Debug|x86.ActiveCfg = Debug|Win32
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Debug|x86.Build.0 = Debug|Win32
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Release|x64.ActiveCfg = Release|x64
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Release|x64.Build.0 = Release|x64
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Release|x86.ActiveCfg = Release|Win32
+		{05BA72F4-95EC-4C2C-81F9-F37A6ECFB76F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
