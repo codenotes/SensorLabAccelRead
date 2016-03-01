@@ -93,6 +93,11 @@ bool parseComma(string & s, sensor_msgs::Imu & imu)
 
 			imu.header.stamp = ros::Time::now();
 			imu.header.frame_id = std::string("odom");
+
+
+			//change ros coordinates
+
+
 			imu_pub.publish(imu);
 
 
