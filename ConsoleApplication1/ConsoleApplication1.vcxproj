@@ -151,8 +151,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\AccelSocketRead\data.cpp" />
     <ClCompile Include="ConsoleApplication1.cpp" />
+    <ClCompile Include="data2.cpp" />
     <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

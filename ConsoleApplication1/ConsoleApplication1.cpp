@@ -32,21 +32,21 @@ int main()
 	p.setCB(testt);
 	//MyTestFunction f = boost::bind(testt);
 	
-	sample1[225] = 0;
+//	sample1[225] = 0;
 	string s((char*)sample1);
 
 	//cout << s << endl;
 
-	for (auto c : s)
-	{
-		cout << c << " " << (int)c << endl;
-		if (c == '\n')
-			cout << "found!" << endl;
-	}
+	//for (auto c : s)
+	//{
+	//	cout << c << " " << (int)c << endl;
+	//	if (c == '\n')
+	//		cout << "found!" << endl;
+	//}
 //	printf("%s", (char*)sample1);
 
 
-	//p.feedstate((char*) sample1   );
+	p.feedstate((char*) sample1   );
 	
 	
 	return 0;

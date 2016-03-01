@@ -46,9 +46,14 @@ public:
 		static bool first = false;
 
 		bool second = false;
+		
+		
+	//	printf("%d\n",c);
+	
 
 		if (c == mEol&&!first)
 		{
+		//	cout << "!!first";
 			first = true;
 			return;
 		}
@@ -57,10 +62,11 @@ public:
 		{
 			if (c == mEol)
 			{
+			//	cout << "**found\n";
 				if (!st.size())
 					return;
 
-				Process(st);
+			//	Process(st);
 				callback(st);
 
 				st.clear();
@@ -80,6 +86,7 @@ public:
 	{
 		for (auto c : s)
 		{
+			//cout << c;
 			state(c);
 		}
 

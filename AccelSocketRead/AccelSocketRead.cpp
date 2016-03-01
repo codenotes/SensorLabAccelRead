@@ -53,14 +53,71 @@ namespace ros
 
 
 
-ParseIt gParse;
+ParseIt gParse('\n', ',');
+
+bool parseComma(string & s, sensor_msgs::Imu & imu)
+{
+
+	std::vector<std::string> list2;
+	//boost::iter_split(stringList, line, boost::first_finder(","));
+	try
+	{
+		boost::iter_split(list2, s, boost::first_finder(","));
+	}
+	catch (...)
+	{
+
+		cout << "bad" << endl;
+		return false;
+	}
+
+	if (list2.size() >= 6)
+	{
+		try
+		{
+			cout << "x:" << list2.at(4) << "\ty:" << list2.at(5) << "\tz:" << list2.at(6) << endl;
+			cout << "gx:" << list2.at(8) << "\tgy:" << list2.at(9) << "\tgz:" << list2.at(10) << endl;
+
+			imu.orientation = tf::createQuaternionMsgFromRollPitchYaw(boost::lexical_cast<double>(list2.at(8)), boost::lexical_cast<double>(list2.at(9)),
+				boost::lexical_cast<double>(list2.at(10)));
+
+			/*	imu.orientation.x = q.x();
+			imu.orientation.y = q.y();
+			imu.orientation.z = q.z();
+			imu.orientation.w = q.w();*/
 
 
+			imu.linear_acceleration.x = boost::lexical_cast<double>(list2.at(4));
+			imu.linear_acceleration.y = boost::lexical_cast<double>(list2.at(5));
+			imu.linear_acceleration.z = boost::lexical_cast<double>(list2.at(6));
+
+			imu.header.stamp = ros::Time::now();
+			imu.header.frame_id = std::string("odom");
+			imu_pub.publish(imu);
+
+
+
+		}
+		catch (exception e)
+		{
+			cout << e.what();
+		}
+
+
+
+
+		return true;
+	}
+
+}
 //will be called for every tween ;; that ParseItReads
+//not being called right now
 bool handleAndSend(string s)
 {
 	//split by smaller delimeters
-	cout << "should parse and send:" << s << endl;
+	//cout << "should parse and send:" << s << endl;
+//	return parseComma(s);
+
 	return true;
 }
 
@@ -68,13 +125,16 @@ bool handleAndSend(string s)
 void handler2(const boost::system::error_code& e, std::size_t size)
 {
 
-	
+	sensor_msgs::Imu imu;
+
 	if (!e)
 	{
 		std::istream is(&b);
 		std::string line;
 		std::getline(is, line);
-		gParse.feedstate(line); //every block that comes from socket, feed into parser who will translate this correctly
+		
+		//gParse.feedstate(line+'\n'); //every block that comes from socket, feed into parser who will translate this correctly
+		parseComma(line,imu);
 		
 	}
 
@@ -173,7 +233,7 @@ void handlerError(const boost::system::error_code& e)
 		std::istream is(&b);
 		std::string line;
 		std::getline(is, line);
-		//cout <<"read:"<<size<<"###"<< line << endl;
+	//	cout <<"herror:read:"<<"###"<< line << endl;
 
 		std::list<std::string> stringList;
 		boost::iter_split(stringList, line, boost::first_finder(","));
