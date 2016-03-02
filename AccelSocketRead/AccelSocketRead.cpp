@@ -292,7 +292,7 @@ int main(int argc, char* argv[])
 		gNode = new ros::NodeHandle;
 
 	//imu_pub = &  gNode->advertise<sensor_msgs::Imu>("ipadimu", 1000);
-	imu_pub = gNode->advertise<sensor_msgs::Imu>("ipadimu", 1000);
+	imu_pub = gNode->advertise<sensor_msgs::Imu>("imu/data_raw", 1000);
 
 
 	gParse.setCB(handleAndSend);
