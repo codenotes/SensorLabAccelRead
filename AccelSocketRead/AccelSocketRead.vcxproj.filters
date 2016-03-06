@@ -27,6 +27,9 @@
     <ClInclude Include="ParseIt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="rk4.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

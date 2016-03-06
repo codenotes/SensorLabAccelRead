@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ParseIt.h" />
+    <ClInclude Include="rk4.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -159,7 +160,9 @@
     <ClCompile Include="medianfilter.cpp" />
     <ClCompile Include="MedianFilter2.cpp" />
     <ClCompile Include="NewItem.cpp" />
-    <ClCompile Include="rk4.cpp" />
+    <ClCompile Include="rk4.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="test2.cpp" />
   </ItemGroup>

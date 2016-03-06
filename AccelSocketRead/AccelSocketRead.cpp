@@ -31,6 +31,8 @@
 #include "ros/builtin_message_traits.h"
 #include "ParseIt.h"
 
+#include "rk4.h"
+
 //listense to sensorlog ipad app.
 #pragma comment(lib,"rosjadecpp-d-2015.lib")
 
