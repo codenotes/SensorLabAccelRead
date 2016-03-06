@@ -7,5 +7,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerCommandArguments>10.1.103.40 50090</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerEnvironment>PATH=C:\Users\gbrill\Source\Repos\Jade\ros_comm\clients\roscpp\rosjadecpp\x64\Debug\;$(PATH)</LocalDebuggerEnvironment>
   </PropertyGroup>
 </Project>
