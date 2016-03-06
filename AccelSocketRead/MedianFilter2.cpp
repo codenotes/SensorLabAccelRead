@@ -202,17 +202,18 @@ int median2test()
 	int i, v;
 	int sz = 5; // size(data) / sizeof(double);
 	
+	createFilter(5);
 
 
 	for (i = 0; i < 10; i++)
 	{
 		//v = rand() & 127;
 		v =  dtest2[i] ;
-		printf("Inserting %3d \n", v);
+	//	printf("Inserting %3d \n", v);
 		MediatorInsert(m, v);
 		v = MediatorMedian(m);
 		printf("Median = %3d. %f\n\n", v,v);
-		ShowTree(m);
+	//	ShowTree(m);
 	}
 
 	return 0;

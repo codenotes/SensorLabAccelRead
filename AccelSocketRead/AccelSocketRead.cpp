@@ -287,6 +287,8 @@ void ROSLoop(int argc, char* argv[], char * nodename)
 int main(int argc, char* argv[])
 {
 	ros::init(argc, argv, "iPadIMUNode");
+	median2test();
+	return 0;
 
 	if (!gNode)
 		gNode = new ros::NodeHandle;

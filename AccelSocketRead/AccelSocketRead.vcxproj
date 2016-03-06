@@ -159,6 +159,7 @@
     <ClCompile Include="medianfilter.cpp" />
     <ClCompile Include="MedianFilter2.cpp" />
     <ClCompile Include="NewItem.cpp" />
+    <ClCompile Include="rk4.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="test2.cpp" />
   </ItemGroup>
