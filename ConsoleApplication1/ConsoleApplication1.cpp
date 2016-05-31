@@ -18,7 +18,8 @@ using namespace std;
 
 
 extern std::vector<float> nudge;
-
+extern std::vector<float> keyboardLengthXToRight;
+extern std::vector<float> TwokeyboardLengthXToRight;
 //struct  State;
 
 //float acceleration(const State &state, float t);
@@ -48,6 +49,7 @@ public:
 	{
 		float x;
 		float v;
+		float accumX;
 	};
 
 	struct Derivative
@@ -252,10 +254,13 @@ public:
 
 		float numsamples = samples.size();
 		float looplen = numsamples / sampleRate / 4.0f;
+		
+		mState.accumX = 0;
 
 		while (t < looplen)
 		{
-			printf("%.2f, %.2f\n", mState.x, mState.v);
+			mState.accumX += mState.x;
+			printf("x:%.2f,v:%.2f accumX:%.2f\n", mState.x, mState.v, mState.accumX);
 			integrate(mState, t, dt);
 			t += dt;
 		}
@@ -368,9 +373,10 @@ int main()
 
 	//return 0;
 
-	RK4 rk4(nudge,125);
-	rk4.setDeadBand(4);
-	rk4.setCutDirection(RK4::CutDirection::None);
+	RK4 rk4(TwokeyboardLengthXToRight,40);
+	rk4.setDeadBand(0);
+	//rk4.setCutDirection(RK4::CutDirection::None);
+	rk4.setCutDirection(RK4::CutDirection::Positive); 
 	//rk4.setSample(nudge);
 	//rk4.sampleRate = 125;
 	//rk4.t = 0;
